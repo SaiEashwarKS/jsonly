@@ -27,6 +27,11 @@ function bootstrap() {
 
   const container = document.createElement("div");
   container.id = "jsonly-react-root";
+  // Prevent keyboard events from reaching the host page
+  // (e.g. site shortcuts firing while editing JSON values)
+  for (const eventType of ["keydown", "keyup", "keypress"] as const) {
+    container.addEventListener(eventType, (e) => e.stopPropagation());
+  }
   shadow.appendChild(container);
 
   createRoot(container).render(
