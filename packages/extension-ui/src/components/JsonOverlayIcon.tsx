@@ -6,7 +6,11 @@ interface JsonOverlayIconProps {
   onClick: () => void;
 }
 
-export function JsonOverlayIcon({ rect, isActive, onClick }: JsonOverlayIconProps) {
+export function JsonOverlayIcon({
+  rect,
+  isActive,
+  onClick,
+}: JsonOverlayIconProps) {
   // Hide when off-screen
   if (
     rect.bottom < 0 ||
@@ -32,8 +36,8 @@ export function JsonOverlayIcon({ rect, isActive, onClick }: JsonOverlayIconProp
           ? "bg-blue-600 text-white"
           : "bg-white/90 text-gray-600 hover:bg-blue-50 hover:text-blue-600 dark:bg-gray-800/90 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-blue-400"
       } border border-gray-200 backdrop-blur-sm dark:border-gray-600`}
-      title="View JSON"
-      aria-label="View JSON"
+      title="View with jsonly"
+      aria-label="View with jsonly"
     >
       <Braces size={16} />
     </button>
