@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useReducer, useRef, useState } from "react";
 import JsonView from "react18-json-view";
 import "react18-json-view/src/style.css";
 import "react18-json-view/src/dark.css";
@@ -27,6 +27,10 @@ export function JsonViewer({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [collapseKey, setCollapseKey] = useState(0);
   const [isRaw, setIsRaw] = useState(false);
+  const [isModified, setIsModified] = useState(false);
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+
+  const originalData = useRef<any>(null);
 
   const parsed = useMemo(() => {
     try {
@@ -35,6 +39,22 @@ export function JsonViewer({
       return { data: null, error: (e as Error).message };
     }
   }, [json]);
+
+  // Keep an untouched deep clone of the original for raw view & reset
+  if (parsed.data !== null && originalData.current === null) {
+    originalData.current = structuredClone(parsed.data);
+  }
+
+  // The library's working copy that gets mutated in-place
+  const editedData = useRef<any>(null);
+  if (parsed.data !== null && editedData.current === null) {
+    editedData.current = parsed.data;
+  }
+
+  const handleChange = useCallback(() => {
+    setIsModified(true);
+    forceUpdate();
+  }, []);
 
   function handleToggleCollapse() {
     if (isCollapsed) {
@@ -49,7 +69,9 @@ export function JsonViewer({
 
   function handleCopy() {
     try {
-      navigator.clipboard.writeText(JSON.stringify(parsed.data, null, 2));
+      navigator.clipboard.writeText(
+        JSON.stringify(editedData.current, null, 2),
+      );
     } catch {
       // clipboard API may be blocked
     }
@@ -57,6 +79,14 @@ export function JsonViewer({
 
   function handleToggleRaw() {
     setIsRaw((r) => !r);
+  }
+
+  function handleReset() {
+    editedData.current = structuredClone(originalData.current);
+    setIsModified(false);
+    setCollapseDepth(2);
+    setIsCollapsed(false);
+    setCollapseKey((k) => k + 1);
   }
 
   return (
@@ -80,21 +110,24 @@ export function JsonViewer({
         onCopy={handleCopy}
         onToggleRaw={handleToggleRaw}
         isRaw={isRaw}
+        isModified={isModified}
+        onReset={handleReset}
       />
       <div className="flex-1 overflow-auto p-3 text-sm">
         {parsed.error ? (
           <div className="text-red-500">Invalid JSON: {parsed.error}</div>
         ) : isRaw ? (
           <pre className="whitespace-pre-wrap font-mono text-xs text-gray-800 dark:text-gray-200">
-            {JSON.stringify(parsed.data, null, 2)}
+            {JSON.stringify(originalData.current, null, 2)}
           </pre>
         ) : (
           <JsonView
             key={collapseKey}
-            src={parsed.data}
+            src={editedData.current}
             collapsed={collapseDepth}
             dark={isDark}
             editable
+            onChange={handleChange}
             enableClipboard
             displaySize="collapsed"
             collapseStringsAfterLength={80}

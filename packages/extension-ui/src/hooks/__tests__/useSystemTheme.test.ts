@@ -20,41 +20,43 @@ function mockMatchMedia(matches: boolean) {
   return { mql, listeners };
 }
 
-afterEach(() => {
-  vi.restoreAllMocks();
-});
-
-test("returns isDark false when system prefers light", () => {
-  mockMatchMedia(false);
-  const { result } = renderHook(() => useSystemTheme());
-  expect(result.current.isDark).toBe(false);
-});
-
-test("returns isDark true when system prefers dark", () => {
-  mockMatchMedia(true);
-  const { result } = renderHook(() => useSystemTheme());
-  expect(result.current.isDark).toBe(true);
-});
-
-test("updates reactively when preference changes", () => {
-  const { listeners } = mockMatchMedia(false);
-  const { result } = renderHook(() => useSystemTheme());
-  expect(result.current.isDark).toBe(false);
-
-  act(() => {
-    for (const listener of listeners) {
-      listener({ matches: true });
-    }
+describe("useSystemTheme", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
-  expect(result.current.isDark).toBe(true);
-});
 
-test("cleans up listener on unmount", () => {
-  const { mql } = mockMatchMedia(false);
-  const { unmount } = renderHook(() => useSystemTheme());
-  unmount();
-  expect(mql.removeEventListener).toHaveBeenCalledWith(
-    "change",
-    expect.any(Function),
-  );
+  test("returns isDark false when system prefers light", () => {
+    mockMatchMedia(false);
+    const { result } = renderHook(() => useSystemTheme());
+    expect(result.current.isDark).toBe(false);
+  });
+
+  test("returns isDark true when system prefers dark", () => {
+    mockMatchMedia(true);
+    const { result } = renderHook(() => useSystemTheme());
+    expect(result.current.isDark).toBe(true);
+  });
+
+  test("updates reactively when preference changes", () => {
+    const { listeners } = mockMatchMedia(false);
+    const { result } = renderHook(() => useSystemTheme());
+    expect(result.current.isDark).toBe(false);
+
+    act(() => {
+      for (const listener of listeners) {
+        listener({ matches: true });
+      }
+    });
+    expect(result.current.isDark).toBe(true);
+  });
+
+  test("cleans up listener on unmount", () => {
+    const { mql } = mockMatchMedia(false);
+    const { unmount } = renderHook(() => useSystemTheme());
+    unmount();
+    expect(mql.removeEventListener).toHaveBeenCalledWith(
+      "change",
+      expect.any(Function),
+    );
+  });
 });

@@ -15,6 +15,7 @@
     "format:check": "oxfmt --check --no-error-on-unmatched-pattern ."
   },
   "dependencies": {
+    "lucide-react": "^1.7.0",
     "react": "^19",
     "react-dom": "^19",
     "react18-json-view": "^0.2",
