@@ -17,6 +17,7 @@
   "dependencies": {
     "react": "^19",
     "react-dom": "^19",
+    "react18-json-view": "^0.2",
     "tailwindcss": "^4"
   },
   "devDependencies": {
