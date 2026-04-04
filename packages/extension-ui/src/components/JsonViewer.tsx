@@ -61,7 +61,7 @@ export function JsonViewer({
       setCollapseDepth(false);
       setIsCollapsed(false);
     } else {
-      setCollapseDepth(true);
+      setCollapseDepth(1);
       setIsCollapsed(true);
     }
     setCollapseKey((k) => k + 1);
