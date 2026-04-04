@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "jsonly",
+  "version": "0.1.0",
+  "description": "Detect JSON and beautify, edit, search and copy",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "jsonly@example.com",
+      "strict_min_version": "109.0"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
