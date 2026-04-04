@@ -46,7 +46,9 @@ export function App() {
         className="h-64 w-full max-w-lg rounded border border-gray-300 p-3 font-mono text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
         spellCheck={false}
       />
-      {showViewer && <JsonViewer json={json} onClose={() => setShowViewer(false)} />}
+      {showViewer && (
+        <JsonViewer json={json} onClose={() => setShowViewer(false)} />
+      )}
     </div>
   );
 }

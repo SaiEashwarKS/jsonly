@@ -91,7 +91,7 @@ export function JsonViewer({
 
   return (
     <div
-      className="fixed z-2147483647 flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900"
+      className="fixed z-2147483647 flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-gray-50 shadow-2xl dark:border-gray-700 dark:bg-gray-950"
       style={{
         left: position.x,
         top: position.y,
