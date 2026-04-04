@@ -1,0 +1,13 @@
+{
+  "name": "@jsonly/chrome",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "oxlint --type-aware .",
+    "format": "oxfmt --write --no-error-on-unmatched-pattern .",
+    "format:check": "oxfmt --check --no-error-on-unmatched-pattern ."
+  },
+  "dependencies": {
+    "@jsonly/extension-ui": "workspace:*"
+  }
+}
