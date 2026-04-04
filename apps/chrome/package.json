@@ -3,11 +3,24 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
     "lint": "oxlint --type-aware .",
     "format": "oxfmt --write --no-error-on-unmatched-pattern .",
     "format:check": "oxfmt --check --no-error-on-unmatched-pattern ."
   },
   "dependencies": {
-    "@jsonly/extension-ui": "workspace:*"
+    "@jsonly/extension-ui": "workspace:*",
+    "react": "^19",
+    "react-dom": "^19",
+    "react18-json-view": "^0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6",
+    "tailwindcss": "^4",
+    "vite": "^8"
   }
 }

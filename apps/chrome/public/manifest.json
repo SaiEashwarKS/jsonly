@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "jsonly",
+  "version": "0.1.0",
+  "description": "Detect JSON and beautify, edit, search and copy",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
