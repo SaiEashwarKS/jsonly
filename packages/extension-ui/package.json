@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "lint": "oxlint --type-aware .",
     "format": "oxfmt --write --no-error-on-unmatched-pattern .",
-    "format:check": "oxfmt --check --no-error-on-unmatched-pattern ."
+    "format:check": "oxfmt --check --no-error-on-unmatched-pattern .",
+    "demo": "open demo/django-admin.html"
   },
   "dependencies": {
     "lucide-react": "^1.7.0",

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change API Response Log | Django site admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+            background: #fafafa;
+        }
+
+        #header {
+            background: #417690;
+            color: #fafafa;
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #header h1 {
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        #header h1 a {
+            color: #fafafa;
+            text-decoration: none;
+        }
+
+        #header #user-tools {
+            font-size: 11px;
+        }
+
+        #header #user-tools a {
+            color: #fafafa;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .breadcrumbs {
+            background: #79aec8;
+            padding: 10px 40px;
+            font-size: 12px;
+            color: #c4dce8;
+        }
+
+        .breadcrumbs a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        #content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 40px;
+        }
+
+        #content h1 {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .module {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .module h2 {
+            background: #79aec8;
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 400;
+            text-transform: uppercase;
+        }
+
+        .form-row {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            overflow: hidden;
+        }
+
+        .form-row:last-child {
+            border-bottom: none;
+        }
+
+        .form-row label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .form-row label.required::after {
+            content: " *";
+            color: #cc3333;
+        }
+
+        .form-row input[type="text"],
+        .form-row select {
+            font-family: "Segoe UI", system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 610px;
+            background: #fff;
+        }
+
+        .form-row input[type="text"]:focus,
+        .form-row select:focus {
+            border-color: #417690;
+            outline: none;
+        }
+
+        .form-row .help {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .json-field pre {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+            word-wrap: normal;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .json-field textarea {
+            background: #f8f8f8;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            width: 100%;
+            max-width: 610px;
+            resize: vertical;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1><a href="#">Django administration</a></h1>
+        <div id="user-tools">Welcome, <strong>admin</strong>. <a href="#">View site</a> / <a href="#">Change password</a> / <a href="#">Log out</a></div>
+    </div>
+
+    <div class="breadcrumbs">
+        <a href="#">Home</a> &rsaquo; <a href="#">API Response Logs</a> &rsaquo; Change API Response Log
+    </div>
+
+    <div id="content">
+        <h1>Change API Response Log</h1>
+
+        <form>
+            <div class="module">
+                <h2>General Information</h2>
+
+                <div class="form-row">
+                    <label class="required" for="id_name">Name:</label>
+                    <input type="text" id="id_name" name="name" value="Production Auth Service - Login Endpoint">
+                </div>
+
+                <div class="form-row">
+                    <label class="required" for="id_endpoint_url">Endpoint URL:</label>
+                    <input type="text" id="id_endpoint_url" name="endpoint_url" value="https://api.example.com/v1/auth/login">
+                </div>
+
+                <div class="form-row">
+                    <label class="required" for="id_status_code">Status Code:</label>
+                    <select id="id_status_code" name="status_code">
+                        <option value="">---------</option>
+                        <option value="200" selected>200 OK</option>
+                        <option value="201">201 Created</option>
+                        <option value="400">400 Bad Request</option>
+                        <option value="401">401 Unauthorized</option>
+                        <option value="403">403 Forbidden</option>
+                        <option value="404">404 Not Found</option>
+                        <option value="500">500 Internal Server Error</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label class="required" for="id_timestamp">Timestamp:</label>
+                    <input type="text" id="id_timestamp" name="timestamp" value="2026-04-05 14:32:18 UTC">
+                    <div class="help">Date and time when the API call was recorded.</div>
+                </div>
+            </div>
+
+            <div class="module">
+                <h2>Request &amp; Response Data</h2>
+
+                <div class="form-row json-field">
+                    <label for="id_request_payload">Request Payload:</label>
+                    <textarea id="id_request_payload" rows="6">{"userId":"usr_28fA9k1","email":"jane.doe@example.com","fullName":"Jane Doe","phone":"+1-555-867-5309","role":"member","address":{"street":"742 Evergreen Terrace","city":"Springfield","state":"IL","zip":"62704","country":"US"},"preferences":{"locale":"en-US","timezone":"America/Chicago","newsletter":true,"theme":"dark","notifications":{"email":true,"sms":false,"push":true}},"tags":["premium","early-adopter","beta-tester"],"referralCode":"REF-8832KX","acceptedTerms":true,"signupSource":"mobile-app"}</textarea>
+                    <div class="help">The JSON body sent with the API request.</div>
+                </div>
+
+                <div class="form-row json-field">
+                    <label for="id_response_body">Response Body:</label>
+                    <pre id="id_response_body">{"status":"success","code":200,"message":"Users retrieved successfully","data":[{"id":"usr_28fA9k1","email":"jane.doe@example.com","fullName":"Jane Doe","role":"member","verified":true,"createdAt":"2025-11-14T08:22:31Z","lastLogin":"2026-04-05T14:30:02Z","avatar":"https://cdn.example.com/avatars/usr_28fA9k1.jpg"},{"id":"usr_93bZ2m7","email":"bob.smith@example.com","fullName":"Bob Smith","role":"admin","verified":true,"createdAt":"2024-06-01T12:00:00Z","lastLogin":"2026-04-04T09:15:44Z","avatar":"https://cdn.example.com/avatars/usr_93bZ2m7.jpg"},{"id":"usr_47cW8n3","email":"alice.wang@example.com","fullName":"Alice Wang","role":"member","verified":false,"createdAt":"2026-03-28T16:45:12Z","lastLogin":null,"avatar":null}],"meta":{"page":1,"perPage":25,"totalItems":142,"totalPages":6,"hasNextPage":true,"hasPrevPage":false},"links":{"self":"https://api.example.com/v1/users?page=1","next":"https://api.example.com/v1/users?page=2","last":"https://api.example.com/v1/users?page=6"},"requestId":"req_a1b2c3d4e5"}</pre>
+                    <div class="help">The JSON body returned in the API response.</div>
+                </div>
+            </div>
+
+            <div class="module">
+                <h2>Additional Data</h2>
+
+                <div class="form-row json-field">
+                    <label for="id_webhook_headers">Webhook Headers:</label>
+                    <pre id="id_webhook_headers">{"Content-Type":"application/json; charset=utf-8","Authorization":"Bearer eyJhbGci...REDACTED","X-Request-ID":"req_a1b2c3d4e5","X-Correlation-ID":"corr_f6g7h8i9j0","Accept":"application/json","User-Agent":"ExampleApp/2.4.1 (Linux; x86_64)","Cache-Control":"no-cache","X-Forwarded-For":"203.0.113.42","X-RateLimit-Remaining":"487","X-RateLimit-Reset":"1743868800"}</pre>
+                    <div class="help">HTTP headers sent with the webhook notification.</div>
+                </div>
+
+                <div class="form-row json-field">
+                    <label for="id_error_log">Error Log:</label>
+                    <pre id="id_error_log">{"error":{"type":"AuthenticationError","message":"Token validation failed: signature mismatch","code":"AUTH_ERR_4012","severity":"critical","stack":["at TokenValidator.verify (/app/src/auth/validator.js:142:15)","at AuthMiddleware.authenticate (/app/src/middleware/auth.js:87:22)","at Layer.handle (/app/node_modules/express/lib/router/layer.js:95:5)","at next (/app/node_modules/express/lib/router/route.js:144:13)","at Route.dispatch (/app/node_modules/express/lib/router/route.js:114:3)"],"context":{"request":{"method":"POST","url":"/v1/auth/login","ip":"203.0.113.42","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"},"response":{"statusCode":401,"body":{"error":"unauthorized","message":"Invalid or expired token"}},"user":{"id":"usr_28fA9k1","sessionId":"sess_x9y8z7w6"}}},"timestamps":{"occurred":"2026-04-05T14:32:18.003Z","detected":"2026-04-05T14:32:18.047Z","logged":"2026-04-05T14:32:18.051Z"},"environment":"production","service":"auth-gateway","version":"3.12.1"}</pre>
+                    <div class="help">Detailed error trace captured during the API call.</div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
