@@ -17,6 +17,23 @@ function bootstrap() {
   host.style.height = "0";
   host.style.overflow = "visible";
   host.style.zIndex = "2147483647";
+
+  // Block host-page keyboard shortcuts from firing while the viewer is
+  // focused. Attach on `host` (light DOM) in bubble phase so the event
+  // fully propagates through the shadow tree first — React handlers and
+  // contentEditable default actions (typing, backspace, selection-replace)
+  // run normally, and only then do we cut off propagation to
+  // documentElement/document/window.
+  //
+  // Don't attach this inside the shadow DOM (on `container`): a descendant
+  // bubble-phase stopPropagation during shadow dispatch breaks
+  // contentEditable editing on Firefox (and on Chrome in combination with
+  // certain React/shadow-DOM timings). Don't use { capture: true } here
+  // either — capture phase runs BEFORE the event enters the shadow tree.
+  for (const eventType of ["keydown", "keyup", "keypress"] as const) {
+    host.addEventListener(eventType, (e) => e.stopPropagation());
+  }
+
   document.documentElement.appendChild(host);
 
   const shadow = host.attachShadow({ mode: "open" });
@@ -43,11 +60,6 @@ function bootstrap() {
 
   const container = document.createElement("div");
   container.id = "jsonly-react-root";
-  // Prevent keyboard events from reaching the host page
-  // (e.g. site shortcuts firing while editing JSON values)
-  for (const eventType of ["keydown", "keyup", "keypress"] as const) {
-    container.addEventListener(eventType, (e) => e.stopPropagation());
-  }
   shadow.appendChild(container);
 
   createRoot(container).render(
