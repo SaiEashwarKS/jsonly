@@ -1,11 +1,19 @@
-import { useCallback, useMemo, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import JsonView from "react18-json-view";
 import "react18-json-view/src/style.css";
 import "react18-json-view/src/dark.css";
 
 import { useDrag } from "../hooks/useDrag";
+import { useJsonSearch } from "../hooks/useJsonSearch";
 import { useSystemTheme } from "../hooks/useSystemTheme";
 import { JsonToolbar } from "./JsonToolbar";
+import { SearchBar } from "./SearchBar";
 
 export interface JsonViewerProps {
   json: string;
@@ -29,6 +37,9 @@ export function JsonViewer({
   const [isRaw, setIsRaw] = useState(false);
   const [isModified, setIsModified] = useState(false);
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const jsonRegionRef = useRef<HTMLDivElement>(null);
 
   const originalData = useRef<any>(null);
 
@@ -56,6 +67,30 @@ export function JsonViewer({
     forceUpdate();
   }, []);
 
+  const bumpCollapseKey = useCallback(() => {
+    setCollapseKey((k) => k + 1);
+  }, []);
+
+  const {
+    searchOpen,
+    searchQuery,
+    currentMatchIndex,
+    matchCount,
+    collapsedProp,
+    customizeNode,
+    closeSearch,
+    onQueryChange,
+    onNext,
+    onPrev,
+  } = useJsonSearch({
+    data: editedData.current,
+    collapseDepth,
+    isModified,
+    jsonRegionRef,
+    viewerRef,
+    bumpCollapseKey,
+  });
+
   function handleToggleCollapse() {
     if (isCollapsed) {
       setCollapseDepth(false);
@@ -78,6 +113,10 @@ export function JsonViewer({
   }
 
   function handleToggleRaw() {
+    // Close search before toggling raw view
+    if (searchOpen) {
+      closeSearch();
+    }
     setIsRaw((r) => !r);
   }
 
@@ -91,6 +130,8 @@ export function JsonViewer({
 
   return (
     <div
+      ref={viewerRef}
+      tabIndex={-1}
       className="fixed z-2147483647 flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-gray-50 shadow-2xl dark:border-gray-700 dark:bg-gray-950"
       style={{
         left: position.x,
@@ -113,7 +154,18 @@ export function JsonViewer({
         isModified={isModified}
         onReset={handleReset}
       />
-      <div className="flex-1 overflow-auto p-3 text-sm">
+      {searchOpen && (
+        <SearchBar
+          query={searchQuery}
+          onQueryChange={onQueryChange}
+          matchCount={matchCount}
+          currentIndex={currentMatchIndex}
+          onNext={onNext}
+          onPrev={onPrev}
+          onClose={closeSearch}
+        />
+      )}
+      <div ref={jsonRegionRef} className="flex-1 overflow-auto p-3 text-sm">
         {parsed.error ? (
           <div className="text-red-500">Invalid JSON: {parsed.error}</div>
         ) : isRaw ? (
@@ -124,13 +176,14 @@ export function JsonViewer({
           <JsonView
             key={collapseKey}
             src={editedData.current}
-            collapsed={collapseDepth}
+            collapsed={collapsedProp}
             dark={isDark}
             editable
             onChange={handleChange}
             enableClipboard
             displaySize="collapsed"
             collapseStringsAfterLength={80}
+            customizeNode={customizeNode}
           />
         )}
       </div>
