@@ -6,7 +6,7 @@ export interface JsonMatch {
 const MAX_TEXT_LENGTH = 5 * 1024 * 1024; // 5MB
 
 export function scanForJson(root: ParentNode = document): JsonMatch[] {
-  const candidates = root.querySelectorAll<HTMLElement>("pre, code");
+  const candidates = root.querySelectorAll<HTMLElement>("pre, code, textarea");
   const matches: JsonMatch[] = [];
   const matchedElements = new Set<HTMLElement>();
 
