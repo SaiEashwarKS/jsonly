@@ -56,6 +56,53 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * Shadow-DOM fallback for Tailwind v4 @property registrations
+ * -----------------------------------------------------------
+ * Tailwind v4 border/shadow/ring utilities resolve through CSS custom
+ * properties registered with @property at the top of the Tailwind stylesheet:
+ *   .border { border-style: var(--tw-border-style); border-width: 1px }
+ *   @property --tw-border-style { syntax:"*"; inherits:false; initial-value:solid }
+ *
+ * Tailwind ships an @supports fallback that hard-sets these variables on
+ * *,:before,:after,::backdrop — but its feature test gates only Safari and
+ * Firefox. Chrome is expected to get the value from @property's initial-value.
+ *
+ * The quirk: content.tsx injects the whole Tailwind stylesheet (including the
+ * @property rules) into a <style> tag INSIDE an open shadow root. Chrome does
+ * not reliably register @property rules declared inside shadow roots. When
+ * registration fails, `var(--tw-border-style)` resolves to nothing,
+ * `border-style: <nothing>` is invalid-at-computed-value, and the property
+ * falls back to its CSS initial value `none`. Border width and color are
+ * correct, but border-style:none renders no visible border at all.
+ *
+ * shadow-2xl is affected through --tw-shadow / --tw-inset-shadow / --tw-ring*
+ * for the same reason (box-shadow multiplexes five custom properties — losing
+ * any of them breaks the whole declaration).
+ *
+ * Fix: explicitly set the fallback values on the shadow root's subtree. Same
+ * values as @property's initial-values, so this is a no-op in browsers where
+ * registration works. Keep this list in sync with the @layer properties
+ * @supports block emitted by Tailwind v4 (visible in apps/chrome/dist/content.js
+ * around the `@layer properties` rule).
+ */
+#jsonly-react-root,
+#jsonly-react-root *,
+#jsonly-react-root ::before,
+#jsonly-react-root ::after,
+#jsonly-react-root ::backdrop {
+  --tw-border-style: solid;
+  --tw-shadow: 0 0 #0000;
+  --tw-shadow-alpha: 100%;
+  --tw-inset-shadow: 0 0 #0000;
+  --tw-inset-shadow-alpha: 100%;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-inset-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-offset-shadow: 0 0 #0000;
+}
+
 /* Dark-mode override for the root color. This codebase uses
  * `@media (prefers-color-scheme: dark)` for dark mode everywhere (Tailwind's
  * `dark:` variants compile to this media query by default). No `.dark` class
