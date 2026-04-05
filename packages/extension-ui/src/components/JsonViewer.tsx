@@ -80,6 +80,7 @@ export function JsonViewer({
     onQueryChange,
     onNext,
     onPrev,
+    searchInputRef,
   } = useJsonSearch({
     data: editedData.current,
     collapseDepth,
@@ -161,6 +162,7 @@ export function JsonViewer({
           onNext={onNext}
           onPrev={onPrev}
           onClose={closeSearch}
+          inputRef={searchInputRef}
         />
       )}
       <div ref={jsonRegionRef} className="flex-1 overflow-auto p-3 text-sm">

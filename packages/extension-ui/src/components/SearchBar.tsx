@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronUp, Search, X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { type RefObject, useEffect } from "react";
 
 interface SearchBarProps {
   query: string;
@@ -9,6 +9,7 @@ interface SearchBarProps {
   onNext: () => void;
   onPrev: () => void;
   onClose: () => void;
+  inputRef: RefObject<HTMLInputElement | null>;
 }
 
 export function SearchBar({
@@ -19,12 +20,11 @@ export function SearchBar({
   onNext,
   onPrev,
   onClose,
+  inputRef,
 }: SearchBarProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
     inputRef.current?.focus();
-  }, []);
+  }, [inputRef]);
 
   function handleKeyDown(e: React.KeyboardEvent) {
     e.stopPropagation();

@@ -210,6 +210,10 @@ export function useJsonSearch({
   const searchOpenRef = useRef(searchOpen);
   searchOpenRef.current = searchOpen;
 
+  // Shared ref to the SearchBar input so the cmd+f handler can focus it
+  // directly when the search bar is already open.
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   // Ctrl/Cmd+F handler — uses capture phase so it fires even when a child
   // element inside the viewer has focus (the div itself may never be focused).
   useEffect(() => {
@@ -221,6 +225,10 @@ export function useJsonSearch({
         e.preventDefault();
         e.stopPropagation();
         setSearchOpen(true);
+        // If the search bar is already mounted, focus the input directly.
+        // On first open, this is a no-op (ref is null) and SearchBar's own
+        // mount effect focuses the input after render.
+        searchInputRef.current?.focus();
       }
       if (e.key === "Escape" && searchOpenRef.current) {
         e.preventDefault();
@@ -245,5 +253,6 @@ export function useJsonSearch({
     onQueryChange: setSearchQuery,
     onNext,
     onPrev,
+    searchInputRef,
   };
 }
