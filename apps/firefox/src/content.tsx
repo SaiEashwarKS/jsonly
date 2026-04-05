@@ -22,7 +22,23 @@ function bootstrap() {
   const shadow = host.attachShadow({ mode: "open" });
 
   const style = document.createElement("style");
-  style.textContent = [tailwindCss, jsonViewCss, jsonViewDarkCss].join("\n");
+  // Concatenate the three CSS chunks that will be injected into the shadow DOM.
+  //
+  // Order matters: library CSS first, Tailwind+our CSS second.
+  //
+  // Our highlight rules in extension.css are scoped as `.json-view
+  // .jsonly-search-hit` to MATCH the specificity of react18-json-view's
+  // `.json-view .json-view--string { color: ... }` (both 0,2,0). With equal
+  // specificity, source order decides — so we need our rules (inside
+  // tailwindCss) to come AFTER the library's. That makes highlighted-value
+  // text turn black as intended.
+  //
+  // Don't try to "fix" this by wrapping jsonViewCss in `@layer library { ... }`.
+  // That would demote ALL library rules below Tailwind's `@layer base`,
+  // and Tailwind's preflight includes `svg, img, video, ... { display: block }`.
+  // The library's `.json-view .json-view--copy { display: inline-block }` for
+  // copy/edit icons would lose, stacking them vertically.
+  style.textContent = [jsonViewCss, jsonViewDarkCss, tailwindCss].join("\n");
   shadow.appendChild(style);
 
   const container = document.createElement("div");

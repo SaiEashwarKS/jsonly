@@ -1,2 +1,2 @@
-@import "tailwindcss";
-@source "../../../packages/extension-ui/src";
+/* Thin wrapper: see apps/chrome/src/content.css for explanation. */
+@import "@jsonly/extension-ui/extension.css";

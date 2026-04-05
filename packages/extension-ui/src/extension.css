@@ -1,0 +1,123 @@
+/*
+ * extension.css — the single CSS file shipped by the jsonly extension.
+ *
+ * How it gets loaded:
+ *   • Dev harness: packages/extension-ui/src/index.css imports this file,
+ *     which main.tsx imports via `import "./index.css"`. Vite processes it
+ *     normally for the dev server.
+ *   • Production extensions (Chrome & Firefox): each app's content.css does
+ *     `@import "@jsonly/extension-ui/extension.css"` and then content.tsx
+ *     imports that app's content.css with `?inline`. Vite compiles the full
+ *     Tailwind output into a JS string at build time; content.tsx injects
+ *     that string as a <style> tag INSIDE the shadow DOM at runtime.
+ *
+ * Why Shadow DOM: the extension injects UI into arbitrary web pages. Shadow
+ * DOM isolates our styles from the host page's CSS (and vice-versa) so a
+ * site's `* { color: red }` can't clobber our UI.
+ */
+
+/* Pulls in Tailwind v4's theme, base reset, components, and utilities layers.
+ * In v4 this single line replaces v3's @tailwind base/components/utilities. */
+@import "tailwindcss";
+
+/* @source tells Tailwind WHICH source files to scan for className usage so
+ * it knows which utility classes to generate. Path is relative to THIS CSS
+ * file, so "./" = packages/extension-ui/src/. Tailwind scans every .tsx in
+ * that tree. Without this directive, utilities used in our components would
+ * be tree-shaken out of the build. */
+@source "./";
+
+/*
+ * #jsonly-react-root reset
+ * ------------------------
+ * content.tsx sets `host.style.all = "initial"` on the shadow host element.
+ * That's a defensive move so the HOST div can't be styled by the page.
+ * Downside: `all: initial` is an inline style (highest specificity short of
+ * !important) and it sets the host's `font-family` to `initial` (browser
+ * default — Times serif). Because `font-family` is an INHERITED CSS property,
+ * every element inside the shadow root inherits that serif through the shadow
+ * boundary, even though Tailwind emits `:host { font-family: ... }`.
+ *
+ * The fix: re-establish sane defaults on the React-root container that lives
+ * INSIDE the shadow DOM (not on the host). We use Tailwind custom properties
+ * here so the values stay in sync with the design tokens used by the rest of
+ * the UI (change a token, this updates automatically).
+ *
+ * `color` is set here as an inheritable default so unstyled text inside the
+ * UI picks up gray-800 instead of `canvastext` (black-ish) inherited from the
+ * host's `all: initial`. Components that explicitly set `text-*` classes
+ * override this, as expected.
+ */
+#jsonly-react-root {
+  font-family: var(--default-font-family);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-gray-800);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dark-mode override for the root color. This codebase uses
+ * `@media (prefers-color-scheme: dark)` for dark mode everywhere (Tailwind's
+ * `dark:` variants compile to this media query by default). No `.dark` class
+ * is added manually anywhere — relying on OS preference. */
+@media (prefers-color-scheme: dark) {
+  #jsonly-react-root { color: var(--color-gray-200); }
+}
+
+/*
+ * Search highlight styles
+ * -----------------------
+ * These rules style search matches produced by useJsonSearch.ts. Two flavors:
+ *   .jsonly-search-hit     — any match (yellow bg, black text)
+ *   .jsonly-search-current — the currently-focused match (orange bg, outline)
+ *
+ * Specificity trick: react18-json-view styles values with
+ * `.json-view .json-view--string { color: var(--json-string) }` (specificity
+ * 0,2,0). A plain `.jsonly-search-hit { color }` rule (0,1,0) would LOSE the
+ * cascade — the library's color would keep winning and highlighted text
+ * would stay orange/green instead of turning black.
+ *
+ * Fix: scope our highlight rules under `.json-view` too so they match the
+ * library's specificity (0,2,0). With equal specificity, the LATER-appearing
+ * rule wins. content.tsx concatenates `[jsonViewCss, jsonViewDarkCss,
+ * tailwindCss]` — and this extension.css is compiled INTO tailwindCss — so
+ * our rules come after the library's and win the cascade.
+ *
+ * Why not wrap library CSS in `@layer library { ... }` instead? That would
+ * demote ALL library rules below Tailwind's `@layer base`, and Tailwind's
+ * preflight includes `svg, img, video, ... { display: block }`. The library's
+ * `.json-view .json-view--copy { display: inline-block }` would lose, and
+ * the copy/edit icon buttons would stack vertically instead of sitting on
+ * one line. Specificity-scoping is safer — it touches only what we need.
+ *
+ * Both keys and values get highlighted inside the JSON tree:
+ *   • keys: <mark class="jsonly-search-hit"> wrapped by useJsonSearch.ts
+ *   • values: customizeNode returns { className: "jsonly-search-hit" } which
+ *     gets concatenated onto the value span (`json-view--string`, etc.)
+ * Both are descendants of `.json-view`, so the scoped selector matches both.
+ *
+ * `!important` on .jsonly-search-current: used ONLY on the current-match
+ * because it should also beat any inline styles react18-json-view might
+ * apply to the value span (e.g. via the `customizeNode` callback). Regular
+ * hits don't need !important — source order gives us the win.
+ */
+.json-view .jsonly-search-hit {
+  background-color: #fde68a;           /* amber-200 */
+  color: #000;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.json-view .jsonly-search-current {
+  background-color: #fb923c !important; /* orange-400 */
+  color: #000 !important;
+  outline: 1px solid #ea580c;           /* orange-600 */
+}
+
+/* Dark-mode highlight colors. Using @media here instead of `.dark .xxx`:
+ * no `.dark` class is ever added in this codebase, so a `.dark` selector
+ * would never activate. This matches how Tailwind's `dark:` variants work
+ * in the rest of the app. */
+@media (prefers-color-scheme: dark) {
+  .json-view .jsonly-search-hit     { background-color: #b45309; color: #fff; }          /* amber-700 */
+  .json-view .jsonly-search-current { background-color: #c2410c !important; color: #fff !important; } /* orange-700 */
+}

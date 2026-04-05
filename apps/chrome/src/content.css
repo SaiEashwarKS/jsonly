@@ -1,10 +1,5 @@
-@import "tailwindcss";
-@source "../../../packages/extension-ui/src";
-
-/* Search highlight styles (also in extension-ui/src/index.css for dev) */
-@layer components {
-  .jsonly-search-hit { background-color: #fde68a; color: #000; border-radius: 2px; padding: 0 1px; }
-  .dark .jsonly-search-hit { background-color: #b45309; color: #fff; }
-  .jsonly-search-current { background-color: #fb923c !important; color: #000; outline: 1px solid #ea580c; }
-  .dark .jsonly-search-current { background-color: #c2410c !important; color: #fff; }
-}
+/* Thin wrapper: all CSS for the extension lives in the shared file below.
+ * content.tsx imports THIS file with `?inline`, which triggers Vite/Tailwind
+ * to compile the full chain (tailwindcss + @source scanning + our custom
+ * rules) into a JS string that gets injected into the shadow DOM. */
+@import "@jsonly/extension-ui/extension.css";
