@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "jsonly",
-  "version": "0.1.0",
+  "name": "JSONly - Auto-detect, format and edit JSON",
+  "version": "0.2.0",
   "description": "Detect JSON and beautify, edit, search and copy",
   "icons": {
     "16": "icons/icon-16.png",
